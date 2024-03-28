@@ -3,17 +3,15 @@ function convertUnixTimestampToDateString(timestamp) {
     return new Date(timestamp);
 }
 
-// Função para converter temperatura de Kelvin para Celsius
-function convertKToC(temp){
+function convertKToC(temp) {
     return temp - 273.15;
 }
 
-// Função para converter velocidade de m/s para km/h
 function converteMsToKmh(speed) {
     return speed * 3.6;
 }
 
-function convertePressure(pressure){
+function convertePressure(pressure) {
     return pressure / 100;
 }
 
@@ -22,20 +20,17 @@ function formatDateToLocalTime(date) {
     return date.toLocaleString();
 }
 
-// Dados a serem enviados para a API
 const dataToSend = {
-    "lat": -30.0346,
-    "lon": -51.2300,
+    "lat": 69.6489,  //porto alegre
+    "lon": 18.9550,
     "model": "gfs",
-    "parameters": ["temp", "wind", "pressure"],
+    "parameters": ["temp", "wind", "pressure", "ptype"],
     "levels": ["surface"],
     "key": ""
 };
 
-// URL da API
 const apiUrl = 'https://api.windy.com/api/point-forecast/v2';
 
-// Configuração da solicitação
 const requestOptions = {
     method: 'POST',
     headers: {
@@ -44,45 +39,63 @@ const requestOptions = {
     body: JSON.stringify(dataToSend)
 };
 
-// Fazendo a solicitação para a API
+const weatherInfoContainer = document.getElementById('weather-info');
+
 fetch(apiUrl, requestOptions)
     .then(response => {
-        // Verifica se a solicitação foi bem-sucedida
-        if (!response.ok) {
+        if (response.ok == false) {
             throw new Error('Erro ao fazer solicitação: ' + response.status);
         }
-        // Se estiver tudo bem, converte a resposta para JSON
         return response.json();
     })
     .then(data => {
-
         const tsArray = data.ts;
         const tempSurfaceArray = data['temp-surface'];
         const windVArray = data['wind_u-surface'];
         const windUArray = data['wind_u-surface'];
         const pressureArray = data['pressure-surface'];
+        const pTypeArray = data['ptype-surface'];
 
-        const dates = tsArray.map(timestamp => new Date(timestamp));
 
-        const tempSurface = tempSurfaceArray.map(temp => convertKToC(temp).toFixed(2));
+        for (let index = 2; index <= 20; index++) {
+            const date = convertUnixTimestampToDateString(tsArray[index]);
+            const tempCelsius = convertKToC(tempSurfaceArray[index]).toFixed(0);
+            const windSpeedKmh = converteMsToKmh(Math.sqrt(windVArray[index] ** 2 + windUArray[index] ** 2)).toFixed(0);
+            const pressurehPa = convertePressure(pressureArray[index]).toFixed(0);
+            let pType = '';
 
-        if (windVArray && windUArray && windVArray.length === windUArray.length) {
-            const windSpeedArray = windVArray.map((v, index) => {
-                const speed = Math.sqrt(v ** 2 + windUArray[index] ** 2);
-                return converteMsToKmh(speed).toFixed(1); // Convertendo para km/h e arredondando para uma casa decimal
-            });
-            console.log('Array de velocidades do vento (km/h):', windSpeedArray);
-        } else {
-            console.log('Dados de vento não encontrados ou incompletos na resposta da API');
+            switch (pTypeArray[index]) {
+                case 0:
+                    pType = 'Sem precipitação';
+                    break;
+                case 1:
+                    pType = 'Chuva';
+                    break;
+                case 3:
+                    pType = 'Chuva congelante';
+                    break;
+                case 5:
+                    pType = 'Neve';
+                    break;
+                default:
+                    pType = 'Tipo desconhecido';
+            }
+
+            
+            
+
+            const weatherInfoElement = document.createElement('div');
+            weatherInfoElement.innerHTML = `
+                <p>Data: ${formatDateToLocalTime(date)}</p>
+                <p>Temperatura: ${tempCelsius}°C</p>
+                <p>Velocidade do Vento: ${windSpeedKmh} km/h</p>
+                <p>Pressão: ${pressurehPa} hPa</p>
+                <p>Precipitação: ${pType}</p>
+                <hr>
+            `;
+            weatherInfoContainer.appendChild(weatherInfoElement);
         }
-
-        const pressureSurface = pressureArray.map(pressure => convertePressure(pressure).toFixed(0));
-            console.log(pressureSurface);
-        // Exibir o array de datas formatadas para o fuso horário local
-        const datesFormatted = dates.map(date => formatDateToLocalTime(date));
-        console.log("Array de datas formatadas para o fuso horário local:", datesFormatted);
     })
     .catch(error => {
-        // Manipula erros de solicitação
         console.error('Erro na solicitação:', error);
     });
