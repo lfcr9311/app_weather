@@ -20,9 +20,17 @@ function formatDateToLocalTime(date) {
     return date.toLocaleString();
 }
 
+//Essa conta tem que ser refeita, pois nao condiz com a previsao local
+function calculateWindDirectionDegrees(u, v) {
+    // Calcular o ângulo em radianos usando a função arco-tangente (Math.atan2)
+    let angleDegrees = Math.atan2(v, u) * (180 / Math.PI);
+
+    return angleDegrees;
+}
+
 const dataToSend = {
-    "lat": 69.6489,  //porto alegre
-    "lon": 18.9550,
+    "lat": -30.0330,  //porto alegre
+    "lon": -51.2300,
     "model": "gfs",
     "parameters": ["temp", "wind", "pressure", "ptype"],
     "levels": ["surface"],
@@ -62,6 +70,7 @@ fetch(apiUrl, requestOptions)
             const tempCelsius = convertKToC(tempSurfaceArray[index]).toFixed(0);
             const windSpeedKmh = converteMsToKmh(Math.sqrt(windVArray[index] ** 2 + windUArray[index] ** 2)).toFixed(0);
             const pressurehPa = convertePressure(pressureArray[index]).toFixed(0);
+            const windDirectionDegrees = calculateWindDirectionDegrees(windUArray[index], windVArray[index]);
             let pType = '';
 
             switch (pTypeArray[index]) {
@@ -89,6 +98,7 @@ fetch(apiUrl, requestOptions)
                 <p>Data: ${formatDateToLocalTime(date)}</p>
                 <p>Temperatura: ${tempCelsius}°C</p>
                 <p>Velocidade do Vento: ${windSpeedKmh} km/h</p>
+                <p>Direção do Vento: ${windDirectionDegrees}°</p>
                 <p>Pressão: ${pressurehPa} hPa</p>
                 <p>Precipitação: ${pType}</p>
                 <hr>
