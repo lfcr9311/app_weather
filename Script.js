@@ -29,7 +29,7 @@ const dataToSend = {
     "model": "gfs",
     "parameters": ["temp", "wind", "pressure"],
     "levels": ["surface"],
-    "key": "wKe6PWiC4Gmq3Llii6pIXBbWmslhioC7"
+    "key": ""
 };
 
 // URL da API
