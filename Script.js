@@ -23,15 +23,15 @@ function formatDateToLocalTime(date) {
 // Essa conta tem que ser refeita, pois não condiz com a previsão local
 function calculateWindDirectionDegrees(u, v) {
     // Calcular o ângulo em radianos usando a função arco-tangente (Math.atan2)
-    const angleRadians = Math.atan2(v, u);
+    const angleRadians = Math.atan2(u,v);
 
     // Converter o ângulo de radianos para graus
-    const angleDegrees = (angleRadians * 180 / Math.PI + 360) % 360;
+    const angleDegreesCalculated = (angleRadians * 180 / Math.PI + 360) % 360;
 
-    return angleDegrees;
+    return angleDegreesCalculated;
 }
 
-const coordenadas = { lat: 30.0, lon: 51.2300 };
+const coordenadas = { lat: -30.0, lon: -51.2300 };
 
 // Função para inicializar o mapa
 function initMap() {
@@ -58,7 +58,7 @@ function initMap() {
 }
 
 const dataToSend = {
-    "lat": coordenadas.lat,  //porto alegre
+    "lat": coordenadas.lat, 
     "lon": coordenadas.lon,
     "model": "gfs",
     "parameters": ["temp", "wind", "pressure", "ptype", "windGust"],
