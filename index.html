@@ -7,8 +7,12 @@
 </head>
 <body>
     <div id="weather-info"></div>
+    <div id="map" style="height: 400px; width: 100%;"></div> <!-- Div para exibir o mapa -->
 
-    <script src="Script.js">
-    </script>
+    <!-- Inclua o script do Google Maps API com sua chave de API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyABKFaih0JS7w0BB-ofLH_l-6d9AP6mZG8&callback=initMap" async defer></script>
+
+    <!-- Inclua o seu script JavaScript após o script do Google Maps API -->
+    <script src="Script.js"></script>
 </body>
 </html>
